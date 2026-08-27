@@ -40,7 +40,7 @@ function App() {
 	return (
 		<main className="app-shell">
 			<header className="topbar">
-				<a className="brand" href="/" aria-label="Кадр, на главную"><span className="brand-mark">К</span><span>кадр</span></a>
+				<a className="brand" href={import.meta.env.BASE_URL} aria-label="Кадр, на главную"><span className="brand-mark">К</span><span>кадр</span></a>
 				<nav className="main-nav" aria-label="Основная навигация"><a className="active" href="#movies">Фильмы</a><a href="#watchlist">Мой список <span className="nav-count">3</span></a></nav>
 				<button className="profile-button" type="button" aria-label="Открыть профиль">АК</button>
 			</header>
