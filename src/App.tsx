@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 type Movie = {
@@ -27,15 +27,54 @@ function App() {
 	const [activeGenre, setActiveGenre] = useState('Все фильмы')
 	const [search, setSearch] = useState('')
 	const [sort, setSort] = useState('popular')
+	const [savedMovies, setSavedMovies] = useState<string[]>([])
+
+	useEffect(() => {
+		const getFocusableElements = () => Array.from(document.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input, select, [tabindex="0"]'))
+		const handleRemoteKey = (event: KeyboardEvent) => {
+			const isBack = event.key === 'Escape' || event.key === 'Backspace' || event.keyCode === 10009
+			if (isBack) {
+				if (document.activeElement instanceof HTMLInputElement) document.activeElement.blur()
+				return
+			}
+			const directions: Record<string, 'left' | 'right' | 'up' | 'down'> = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }
+			const direction = directions[event.key]
+			if (!direction) return
+			const elements = getFocusableElements()
+			const current = document.activeElement as HTMLElement | null
+			const currentIndex = current ? elements.indexOf(current) : -1
+			if (currentIndex === -1) { elements[0]?.focus(); event.preventDefault(); return }
+			const currentRect = elements[currentIndex].getBoundingClientRect()
+			const horizontal = direction === 'left' || direction === 'right'
+			const candidates = elements.filter((_, index) => index !== currentIndex).map((element) => ({ element, rect: element.getBoundingClientRect() })).filter(({ rect }) => {
+				if (direction === 'right') return rect.left >= currentRect.right - 8
+				if (direction === 'left') return rect.right <= currentRect.left + 8
+				if (direction === 'down') return rect.top >= currentRect.bottom - 8
+				return rect.bottom <= currentRect.top + 8
+			}).sort((first, second) => {
+				const primary = horizontal ? Math.abs(first.rect.left - currentRect.left) - Math.abs(second.rect.left - currentRect.left) : Math.abs(first.rect.top - currentRect.top) - Math.abs(second.rect.top - currentRect.top)
+				const cross = horizontal ? Math.abs(first.rect.top - currentRect.top) - Math.abs(second.rect.top - currentRect.top) : Math.abs(first.rect.left - currentRect.left) - Math.abs(second.rect.left - currentRect.left)
+				return cross * 3 + primary
+			})
+			if (candidates[0]) {
+				candidates[0].element.focus({ preventScroll: true })
+				candidates[0].element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+				event.preventDefault()
+			}
+		}
+		document.addEventListener('keydown', handleRemoteKey)
+		return () => document.removeEventListener('keydown', handleRemoteKey)
+	}, [])
 
 	const filteredMovies = useMemo(() => {
 		const query = search.toLowerCase().trim()
-		const result = movies.filter((movie) => {
-			const matchesGenre = activeGenre === 'Все фильмы' || movie.genre === activeGenre
-			return matchesGenre && (!query || movie.title.toLowerCase().includes(query))
-		})
+		const result = movies.filter((movie) => (activeGenre === 'Все фильмы' || movie.genre === activeGenre) && (!query || movie.title.toLowerCase().includes(query)))
 		return [...result].sort((first, second) => sort === 'newest' ? second.year - first.year : second.rating - first.rating)
 	}, [activeGenre, search, sort])
+
+	const toggleSavedMovie = (title: string) => {
+		setSavedMovies((current) => current.includes(title) ? current.filter((movie) => movie !== title) : [...current, title])
+	}
 
 	return (
 		<main className="app-shell">
@@ -44,15 +83,9 @@ function App() {
 				<nav className="main-nav" aria-label="Основная навигация"><a className="active" href="#movies">Фильмы</a><a href="#watchlist">Мой список <span className="nav-count">3</span></a></nav>
 				<button className="profile-button" type="button" aria-label="Открыть профиль">АК</button>
 			</header>
-
 			<section className="intro" id="movies"><div><p className="eyebrow">Кураторская подборка</p><h1>Хорошее кино<br /><em>на сегодня.</em></h1></div><p className="intro-note">Фильмы, которые хочется<br />обсуждать после титров.</p></section>
-
-			<section className="toolbar" aria-label="Управление каталогом">
-				<div className="genre-tabs" role="tablist" aria-label="Жанры">{genres.map((genre) => <button key={genre} className={activeGenre === genre ? 'selected' : ''} type="button" onClick={() => setActiveGenre(genre)}>{genre}</button>)}</div>
-				<div className="toolbar-actions"><label className="search-box"><span aria-hidden="true">⌕</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Найти фильм" aria-label="Найти фильм" /></label><label className="sort-box"><span>Сортировка</span><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Сортировка фильмов"><option value="popular">Популярные</option><option value="newest">Новые</option><option value="rating">По рейтингу</option></select></label></div>
-			</section>
-
-			<section className="catalog" aria-live="polite"><div className="catalog-heading"><h2>{activeGenre === 'Все фильмы' ? 'Все фильмы' : activeGenre}</h2><span>{filteredMovies.length} фильма</span></div>{filteredMovies.length ? <div className="movie-grid">{filteredMovies.map((movie, index) => <article className="movie-card" key={movie.title} style={{ '--accent': movie.accent, '--delay': `${index * 70}ms` } as React.CSSProperties}><div className="poster-wrap"><img src={movie.poster} alt={`Постер фильма «${movie.title}»`} /><button className="save-button" type="button" aria-label={`Добавить «${movie.title}» в мой список`}>+</button><span className="rating"><b>★</b> {movie.rating.toFixed(1)}</span></div><div className="movie-info"><div className="movie-meta"><span>{movie.genre}</span><i /><span>{movie.year}</span><i /><span>{movie.runtime}</span></div><h3>{movie.title}</h3><p>{movie.description}</p></div></article>)}</div> : <div className="empty-state"><span>⌕</span><h3>Фильм не найден</h3><p>Попробуйте изменить запрос или выбрать другой жанр.</p></div>}</section>
+			<section className="toolbar" aria-label="Управление каталогом"><div className="genre-tabs" role="tablist" aria-label="Жанры">{genres.map((genre) => <button key={genre} className={activeGenre === genre ? 'selected' : ''} type="button" onClick={() => setActiveGenre(genre)}>{genre}</button>)}</div><div className="toolbar-actions"><label className="search-box"><span aria-hidden="true">⌕</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Найти фильм" aria-label="Найти фильм" /></label><label className="sort-box"><span>Сортировка</span><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Сортировка фильмов"><option value="popular">Популярные</option><option value="newest">Новые</option><option value="rating">По рейтингу</option></select></label></div></section>
+			<section className="catalog" aria-live="polite"><div className="catalog-heading"><h2>{activeGenre === 'Все фильмы' ? 'Все фильмы' : activeGenre}</h2><span>{filteredMovies.length} фильма</span></div>{filteredMovies.length ? <div className="movie-grid">{filteredMovies.map((movie, index) => <article className="movie-card" key={movie.title} tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.querySelector<HTMLButtonElement>('.save-button')?.focus() }} style={{ '--accent': movie.accent, '--delay': `${index * 70}ms` } as React.CSSProperties}><div className="poster-wrap"><img src={movie.poster} alt={`Постер фильма «${movie.title}»`} /><button className="save-button" type="button" onClick={() => toggleSavedMovie(movie.title)} aria-label={`${savedMovies.includes(movie.title) ? 'Убрать' : 'Добавить'} «${movie.title}» ${savedMovies.includes(movie.title) ? 'из' : 'в'} моего списка`}>{savedMovies.includes(movie.title) ? '✓' : '+'}</button><span className="rating"><b>★</b> {movie.rating.toFixed(1)}</span></div><div className="movie-info"><div className="movie-meta"><span>{movie.genre}</span><i /><span>{movie.year}</span><i /><span>{movie.runtime}</span></div><h3>{movie.title}</h3><p>{movie.description}</p></div></article>)}</div> : <div className="empty-state"><span>⌕</span><h3>Фильм не найден</h3><p>Попробуйте изменить запрос или выбрать другой жанр.</p></div>}</section>
 			<footer><span>© 2024 Кадр</span><span>Смотрим внимательнее</span></footer>
 		</main>
 	)
