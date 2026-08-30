@@ -1,0 +1,239 @@
+.card {
+  position: relative;
+  overflow: visible;
+  border: 0;
+  border-radius: 22px;
+  background: transparent;
+  box-shadow: none;
+  transition:
+    transform 0.5s ease,
+    filter 0.5s ease;
+  animation: rise 0.6s both;
+  animation-delay: var(--delay);
+}
+
+.card:has(.posterImage.isLoaded) {
+  filter: drop-shadow(0 18px 32px color-mix(in srgb, var(--accent) 32%, transparent));
+}
+
+.poster {
+  position: relative;
+  overflow: hidden;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  border-radius: 20px;
+  background: var(--accent);
+}
+
+.poster::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: center / cover no-repeat var(--poster-image);
+  filter: blur(12px) saturate(0.8);
+  transform: scale(1.06);
+}
+
+.poster::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(25, 20, 14, 0.35));
+  pointer-events: none;
+}
+
+.skeleton {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--accent) 72%, #fff 28%) 20%,
+    color-mix(in srgb, var(--accent) 42%, #fff 58%) 38%,
+    color-mix(in srgb, var(--accent) 72%, #fff 28%) 56%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  transition: opacity 0.35s ease;
+}
+
+.skeleton:has(+ .posterImage.isLoaded) {
+  opacity: 0;
+}
+
+.posterImage {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(0.98);
+  filter: saturate(0.88);
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s ease;
+}
+
+.posterImage.isLoaded {
+  opacity: 1;
+}
+
+.card:hover .posterImage {
+  transform: scale(1.035);
+}
+
+.saveButton {
+  position: absolute;
+  z-index: 3;
+  top: 13px;
+  right: 13px;
+  width: 31px;
+  height: 31px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 50%;
+  background: rgba(24, 19, 14, 0.24);
+  color: #fff;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  border-color: var(--orange);
+  background: var(--orange);
+}
+
+.rating {
+  position: absolute;
+  z-index: 3;
+  bottom: 14px;
+  left: 15px;
+  color: #fff;
+  font:
+    11px 'Space Mono',
+    monospace;
+}
+
+.rating b {
+  color: #f7ba44;
+}
+
+.info {
+  padding: 10px 15px;
+}
+
+.meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 9px;
+}
+
+.title {
+  margin: 0 0 9px;
+  color: #f5f5f7;
+  font:
+    400 clamp(21px, 2vw, 30px) / 1.05 'DM Serif Display',
+    serif;
+}
+
+.description {
+  max-width: 310px;
+  margin: 0;
+  color: var(--muted);
+  font:
+    11px/1.5 'Space Mono',
+    monospace;
+}
+
+.card:focus,
+.card:focus-visible,
+.card:hover {
+  z-index: 3;
+  outline: none;
+  transform: scale(1.045) translateY(-6px);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .poster {
+    aspect-ratio: auto;
+    height: 430px;
+  }
+
+  .description {
+    display: none;
+  }
+
+  .title {
+    font-size: 27px;
+  }
+
+  .saveButton {
+    width: 44px;
+    height: 44px;
+    font-size: 28px;
+  }
+
+  .rating {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 899px) {
+  .poster {
+    height: clamp(230px, 38vw, 330px);
+    aspect-ratio: auto;
+  }
+}
+
+@media (max-width: 650px) {
+  .description {
+    display: none;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .meta {
+    gap: 5px;
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 430px) {
+  .poster {
+    height: 390px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .posterImage,
+  .skeleton {
+    animation: none;
+    transition: none;
+  }
+}

@@ -9,6 +9,14 @@ npm install
 npm run dev
 ```
 
+Для загрузки фильмов нужен API-ключ TMDB. Создайте файл `.env` на основе `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Затем укажите ключ в переменной `VITE_TMDB_API_KEY`. Приложение использует один запрос TMDB: `GET /3/discover/movie`.
+
 ## Публикация на GitHub Pages
 
 1. Отправьте изменения в ветку `main`:

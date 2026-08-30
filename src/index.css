@@ -1,4 +1,21 @@
-#root { min-height: 100svh; }
-* { box-sizing: border-box; }
-body { margin: 0; background: #f4f1eb; color: #292725; font-family: 'Trebuchet MS', sans-serif; }
-button, input, select { font: inherit; }
+#root {
+  min-height: 100svh;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(255, 255, 255, 0.96), transparent 30%),
+    radial-gradient(circle at 92% 18%, rgba(193, 220, 255, 0.58), transparent 32%),
+    linear-gradient(135deg, #e9eef5 0%, #f6f8fb 48%, #e5ebf3 100%);
+  color: #182334;
+  font-family: 'Manrope', sans-serif;
+  min-height: 100svh;
+}
+button,
+input,
+select {
+  font: inherit;
+}

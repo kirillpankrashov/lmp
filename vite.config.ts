@@ -8,9 +8,9 @@
 //     ? `/${process.env.GITHUB_REPOSITORY?.split('/')[1] ?? 'lmp'}/`
 //     : '/',
 // })
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import legacy from '@vitejs/plugin-legacy';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import legacy from '@vitejs/plugin-legacy'
 
 export default defineConfig({
   plugins: [
@@ -21,4 +21,4 @@ export default defineConfig({
     }),
   ],
   base: './',
-});
+})

@@ -1,0 +1,141 @@
+.toolbar {
+  position: sticky;
+  top: 20px;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 17px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background: rgba(30, 31, 37, 0.74);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(24px) saturate(130%);
+}
+
+.genreTabs {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+}
+
+.genreTabs button {
+  border: 0;
+  background: transparent;
+  color: #d5d6dc;
+  padding: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  font:
+    11px 'Space Mono',
+    monospace;
+}
+
+.genreTabs button.selected {
+  color: #fff;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--orange);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.24);
+  padding: 0 0 6px;
+}
+
+.searchBox span {
+  font-size: 21px;
+  line-height: 12px;
+  transform: rotate(-20deg);
+}
+
+.searchBox input {
+  width: 122px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #d5d6dc;
+  font:
+    11px 'Space Mono',
+    monospace;
+}
+
+.searchBox input::placeholder {
+  color: var(--muted);
+}
+
+.sortBox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--tv-muted);
+}
+
+.sortBox select {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #d5d6dc;
+  font:
+    11px 'Space Mono',
+    monospace;
+}
+
+@media (max-width: 650px) {
+  .toolbar {
+    top: 10px;
+    margin-top: -20px;
+  }
+
+  .toolbar,
+  .actions {
+    display: block;
+  }
+
+  .genreTabs {
+    gap: 18px;
+    padding-bottom: 16px;
+  }
+
+  .actions {
+    padding-top: 13px;
+  }
+
+  .searchBox,
+  .sortBox {
+    width: fit-content;
+    margin-bottom: 12px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .toolbar {
+    top: 20px;
+    padding: 17px 0;
+    border-color: var(--tv-line);
+  }
+
+  .genreTabs {
+    gap: 26px;
+  }
+
+  .genreTabs button,
+  .searchBox input,
+  .sortBox select,
+  .sortBox {
+    font-size: 13px;
+  }
+
+  .actions {
+    gap: 28px;
+  }
+}
